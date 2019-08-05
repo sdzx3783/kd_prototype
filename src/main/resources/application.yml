@@ -1,0 +1,25 @@
+spring:
+  application:
+    name: kd-prototype-servant
+  profiles: 
+    active: dev
+  servlet:
+    multipart:
+      max-request-size: 500mb
+      max-file-size: 100Mb
+  redis:
+    host: 172.20.61.42
+    password: admin123
+    port: 6379
+    database: 3
+server:
+  port: 8000
+
+
+kd:
+  zipPath:
+    protoType: D:\programtest\test
+
+management:
+  security:
+    enabled: false

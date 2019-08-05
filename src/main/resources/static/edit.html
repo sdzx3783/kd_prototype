@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title id="title">Title</title>
+</head>
+<script src="jquery.min.js"></script>
+<style type="text/css">
+    .uploadZipFile {
+        text-align: center;
+        margin: 100px;
+    }
+
+    .title {
+        text-align: center;
+    }
+
+    input[readonly] {
+        border: 0px;
+    }
+
+</style>
+<body>
+<div class="title">
+    提示：项目key请联系开发人员获取！
+</div>
+
+<div class="uploadZipFile" id="uploadZipFile" height="600">
+    <form name="zipForm" id="zipForm">
+        <table width="100%" border="0" cellspacing="1" cellpadding="0">
+            <tr align="center">
+                项目key：<input type="text" id="key" name="key" placeholder="请输入项目key"/>
+                <div class="key-check" style="color: red"></div>
+            </tr>
+            <tr align="center">
+                项目名称：<input type="text" id="name" name="name" placeholder="请输入项目名称"/>
+                <div class="name-check" style="color: red"></div>
+            </tr>
+            <tr align="center">
+                创建人：<input type="text" id="creator" name="creator" placeholder="请输入创建人"/>
+                <div class="creator-check" style="color: red"></div>
+            </tr>
+            <tr align="center">
+                项目原型zip包：<input type="file" name="file_zip" id="file-zip"/>
+            </tr>
+            <tr align="center">
+                <input type="button" class="" id="upload-zip" value="提交"/>
+            </tr>
+        </table>
+    </form>
+</div>
+
+</body>
+<script type="text/javascript">
+    var opearate = "";
+    $(window).load(function () {
+        var key = getQueryVariable("key");
+        var proname = getQueryVariable("name");
+        var procreator = getQueryVariable("creator");
+        if (key && key.length > 0) {
+            //修改操作
+            opearate = "update";
+            $("#key").val(key);
+            $("#name").val(proname);
+            $("#creator").val(procreator);
+            $("#key").attr("readonly", "readonly")
+            $("#title").html("更新原型");
+        } else {
+            opearate = "new";
+            $("#title").html("新建原型");
+        }
+        //当鼠标移出输入框
+        $('#key').on('blur', function () {
+            var fileName = document.getElementById("key").value;
+            if (fileName == '') {
+                $('.key-check').html('');
+                $('.key-check').append("请输入项目key！")
+            }
+        });
+        //当鼠标移出输入框
+        $('#name').on('blur', function () {
+            var fileName = document.getElementById("name").value;
+            if (fileName == '') {
+                $('.name-check').html('');
+                $('.name-check').append("请输入项目名称！")
+            }
+        });
+        //当鼠标移出输入框
+        $('#creator').on('blur', function () {
+            var fileName = document.getElementById("creator").value;
+            if (fileName == '') {
+                $('.creator-check').html('');
+                $('.creator-check').append("请输入创建人！")
+            }
+        });
+
+        $("#file-zip").bind("change", function () {
+            var imgArr = ["zip"];
+            if ($(this).val() == "") {
+                alert("请选择文件！");
+            }
+            else {
+                var file = $(this).val();
+                var len = file.length;
+                var ext = file.substring(len - 3, len).toLowerCase();
+                if ($.inArray(ext, imgArr) == -1)
+                    alert("不是zip格式");
+            }
+        });
+
+        $('#upload-zip').on('click', function () {
+            var form = document.getElementById("zipForm");
+            if (document.getElementById("key").value == '') {     //当项目名为空时
+                alert("请输入项目key！");
+                return false;
+            }
+            if (document.getElementById("name").value == '') {     //当项目名为空时
+                alert("请输入项目名称！");
+                return false;
+            }
+            if (document.getElementById("creator").value == '') {     //当项目名为空时
+                alert("请输入创建人！");
+                return false;
+            }
+            if (document.getElementById("file-zip").value == '') {      //当项目为空时
+                alert("请上传项目！");
+                return false;
+            }
+
+            var formdata = new FormData(form);
+            $.ajax({
+                url: "http://172.20.61.42:8000/service/prototype/file/upload",
+                data: formdata,
+                type: "post",
+                //预期服务器返回的数据类型,自动解析json返回值，不设置的话可能要执行oResult = JSON.parse(oResult);进行解析
+                dataType: "json",
+                //默认值: true。默认情况下，通过data选项传递进来的数据，如果是一个对象(技术上讲只要不是字符串)，
+                // 都会处理转化成一个查询字符串，以配合默认内容类型 "application/x-www-form-urlencoded"。如果要发送 DOM 树信息或其它不希望转换的信息，请设置为 false。
+                processData: false,
+                //contentType: false,避免 JQuery 对data操作，可能失去分界符，而使服务器不能正常解析文件。
+                contentType: false,
+                success: function (oResult) {
+//                    console.log(oResult);
+                    if (oResult.retCode == "100") {
+                        alert("操作成功:" + oResult.msg);
+                    } else {
+                        alert("操作失败：" + oResult.msg);
+                    }
+                }
+            })
+//              .done(function(oResult) {   //注意done表示成功，fail表示失败，always表示不论成功还是失败，会执行的函数，
+//                                          //但是在低版本jquery不兼容，是高版本jquery推荐
+//                if(oResult.success==1){
+//                    window.location.href="/";
+//                    alert(oResult.message);
+//                }else{
+//                    alert(oResult.message);
+//                }
+//            }).fail(function () {
+//                alert('出现错误，请重试');
+//            });
+        })
+
+
+        function getQueryVariable(variable) {
+            var query = window.location.search.substring(1);
+            query = decodeURI(query);
+            var vars = query.split("&");
+            for (var i = 0; i < vars.length; i++) {
+                var pair = vars[i].split("=");
+                if (pair[0] == variable) {
+                    return pair[1];
+                }
+            }
+            return (false);
+        }
+    });
+</script>
+
+</html>
