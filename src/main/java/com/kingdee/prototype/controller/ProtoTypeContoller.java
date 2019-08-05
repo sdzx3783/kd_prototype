@@ -6,6 +6,7 @@ import com.kingdee.prototype.cache.ProtoTypeHtmlCache;
 import com.kingdee.prototype.model.PrototypeHtml;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -25,5 +26,10 @@ public class ProtoTypeContoller {
     @RequestMapping("getAll")
     public SimpleOutput<List<PrototypeHtml>> getProtocolTypes() {
         return new SimpleOutput(RetCode.SUCCESS.retCode, RetCode.SUCCESS.message, protoTypeHtmlCache.getAll());
+    }
+
+    @RequestMapping("getAllUpdateLogs")
+    public SimpleOutput<List<PrototypeHtml>> getAllUpdateLogs(@RequestParam String key) {
+        return new SimpleOutput(RetCode.SUCCESS.retCode, RetCode.SUCCESS.message, protoTypeHtmlCache.getAllUpdateLog(key));
     }
 }

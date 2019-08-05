@@ -25,12 +25,17 @@ import java.util.zip.ZipInputStream;
 public class UnzipUtil {
 
 
-    @SuppressWarnings("rawtypes")
-    public static SimpleOutput unZipFiles(String unZipPath, String fileName, MultipartFile multipartFile) throws IOException {
+    public static SimpleOutput unZipFiles(String unZipPath, String fileName, MultipartFile multipartFile, boolean flag) throws IOException {
+        log.debug("unZipPath：{} fileName:{}", unZipPath, fileName);
         SimpleOutput fileHandleResponse = null;
-
-        String unZipRealPath = unZipPath.replaceAll("-", "") + "/" + fileName + "/";
+        String unZipRealPath = "";
+        if (flag) {
+            unZipRealPath = unZipPath.replaceAll("-", "") + "/";
+        } else {
+            unZipRealPath = unZipPath.replaceAll("-", "") + "/" + fileName + "/";
+        }
         //如果保存解压缩文件的目录不存在，则进行创建，并且解压缩后的文件总是放在以fileName命名的文件夹下
+        log.debug("unZipRealPath:{}", unZipRealPath);
         File unZipFile = new File(unZipRealPath);
         if (!unZipFile.exists()) {
             unZipFile.mkdirs();
@@ -56,7 +61,7 @@ public class UnzipUtil {
                 if (new File(outPath).isDirectory()) {
                     continue;
                 }
-                OutputStream outputStream =null;
+                OutputStream outputStream = null;
                 try {
                     outputStream = new FileOutputStream(outPath);
                     byte[] bytes = new byte[4096];
@@ -65,9 +70,9 @@ public class UnzipUtil {
                     while ((len = zipInputStream.read(bytes)) > 0) {
                         outputStream.write(bytes, 0, len);
                     }
-                }catch (Exception e){
+                } catch (Exception e) {
                     log.error("解压文件发生异常 e:{}", e);
-                }finally {
+                } finally {
                     outputStream.close();
                     //必须调用closeEntry()方法来读入下一项
                     zipInputStream.closeEntry();
@@ -81,7 +86,7 @@ public class UnzipUtil {
             log.error("解压文件发生异常 e:{}", e);
             fileHandleResponse = new SimpleOutput(RetCode.FAIL.retCode, RetCode.FAIL.message, null);
         } finally {
-            if(zipInputStream!=null){
+            if (zipInputStream != null) {
                 zipInputStream.close();
             }
         }

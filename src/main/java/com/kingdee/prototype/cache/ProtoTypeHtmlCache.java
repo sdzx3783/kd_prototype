@@ -31,4 +31,15 @@ public class ProtoTypeHtmlCache {
         ).collect(Collectors.toList());
         return collect;
     }
+
+    public void saveUpdateLog(String key, PrototypeHtml prototypeHtml) {
+        simpleCacheService.lPush(key, prototypeHtml);
+    }
+
+    public List<PrototypeHtml> getAllUpdateLog(String key) {
+
+        return simpleCacheService.lGetRange(key, PrototypeHtml.class, 0, 10);
+    }
+
+
 }
