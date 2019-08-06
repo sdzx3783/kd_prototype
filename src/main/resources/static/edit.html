@@ -41,10 +41,15 @@
                 <div class="creator-check" style="color: red"></div>
             </tr>
             <tr align="center">
+                备注：<input type="text" id="remark" name="remark" placeholder="请输入备注"/>
+                <div class="remark-check" style="color: red"></div>
+            </tr>
+            <tr align="center">
                 项目原型zip包：<input type="file" name="file_zip" id="file-zip"/>
             </tr>
             <tr align="center">
-                <input type="button" class="" id="upload-zip" value="提交"/>
+                <input type="button" class="" id="upload-zip" value="提交"/><br/>
+                <input type="button" class="" id="backhome" value="回到首页"/>
             </tr>
         </table>
     </form>
@@ -107,8 +112,11 @@
                     alert("不是zip格式");
             }
         });
-
+        var click=true;
         $('#upload-zip').on('click', function () {
+            if (!click){
+                return alert("请勿重复提交！");
+            }
             var form = document.getElementById("zipForm");
             if (document.getElementById("key").value == '') {     //当项目名为空时
                 alert("请输入项目key！");
@@ -126,10 +134,11 @@
                 alert("请上传项目！");
                 return false;
             }*/
-
+            click=false;
             var formdata = new FormData(form);
             $.ajax({
                 url: "http://172.20.61.42:8000/service/prototype/file/upload",
+                // url: "http://172.17.3.111:8000/service/prototype/file/upload",
                 data: formdata,
                 type: "post",
                 //预期服务器返回的数据类型,自动解析json返回值，不设置的话可能要执行oResult = JSON.parse(oResult);进行解析
@@ -143,8 +152,10 @@
 //                    console.log(oResult);
                     if (oResult.retCode == "100") {
                         alert("操作成功:" + oResult.msg);
+                        click=true;
                     } else {
                         alert("操作失败：" + oResult.msg);
+                        click=true;
                     }
                 }
             })
@@ -174,6 +185,9 @@
             }
             return (false);
         }
+        $("#backhome").on("click",function () {
+            window.location.href="/main";
+        })
     });
 </script>
 

@@ -23,6 +23,11 @@
         margin-top: 20px;
         height: 30px;
     }
+    .remark {
+        width: 400px;
+        word-break: break-all;
+        overflow: auto;
+    }
 </style>
 <body>
 <div class="title">
@@ -39,6 +44,7 @@
                 <th>历史版本</th>
                 <th>项目创建人</th>
                 <th>项目更新时间</th>
+                <th class="remark">备注</th>
                 <th>操作</th>
             </thead>
 
@@ -51,7 +57,8 @@
     $(window).load(function () {
 
             $.ajax({
-                url: "http://172.20.61.42:8000/service/prototype/html/getAllUpdateLogs?key="+getQueryVariable("key"),
+               url: "http://172.20.61.42:8000/service/prototype/html/getAllUpdateLogs?key="+getQueryVariable("key"),
+                // url:"http://172.17.3.111:8000/service/prototype/html/getAllUpdateLogs?key="+getQueryVariable("key"),
                 data: [],
                 type: "post",
                 //预期服务器返回的数据类型,自动解析json返回值，不设置的话可能要执行oResult = JSON.parse(oResult);进行解析
@@ -68,7 +75,7 @@
                         var arr= oResult.retData;
                         for (var i = 0; i <arr.length; i++) {
                             var v=arr[i];
-                            var template = "<tr><td>" + v.key + "</td><td>" + v.name + "</td><td>V" + v.version + "</td><td>" + v.creator + "</td><td>" + v.updateTime + "</td><td><a href='/"+v.key+"'/kd_EC_V_"+v.version+">查看</a></td></tr>";
+                            var template = "<tr><td>" + v.key + "</td><td><a href='/"+v.key+"/kd_EC_V_"+v.version+"'>" + v.name + "</a></td><td>V" + v.version + "</td><td>" + v.creator + "</td><td>" + v.updateTime + "</td><td>"+v.remark+"</td><td><a href='/"+v.key+"/kd_EC_V_"+v.version+"'>查看</a></td></tr>";
                             ht += template;
                         }
                         $("#tab").append(ht)

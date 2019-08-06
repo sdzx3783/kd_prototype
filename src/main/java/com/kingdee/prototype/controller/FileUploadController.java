@@ -6,6 +6,7 @@ import com.kingdee.prototype.base.protocol.SimpleOutput;
 import com.kingdee.prototype.cache.ProtoTypeHtmlCache;
 import com.kingdee.prototype.model.PrototypeHtml;
 import com.kingdee.prototype.util.RedisLockUtil;
+import com.kingdee.prototype.util.RetCodeUtil;
 import com.kingdee.prototype.util.UnzipUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RLock;
@@ -55,27 +56,35 @@ public class FileUploadController {
     @RequestMapping("/upload")
     public SimpleOutput upload(@RequestParam("key") String key,
                                @RequestParam("name") String name,
-                               @RequestParam("creator") String creator,@RequestParam(required=false,name = "file_zip") MultipartFile file) {
+                               @RequestParam("creator") String creator,
+                               @RequestParam(required = false, name = "remark") String remark,
+                               @RequestParam(required = false, name = "file_zip") MultipartFile file) {
         SimpleOutput output = null;
         RLock rLock = null;
         boolean empty = file.isEmpty();
         try {
-            if(StringUtils.isEmpty(key)){
+            if (StringUtils.isEmpty(key)) {
                 throw new RuntimeException("key参数不合法！");
             }
             rLock = RedisLockUtil.getLock(UPDATE_PROTOTYPE_KEY + key, UPDATE_PROTOTYPE_TIMEOUT);
             PrototypeHtml prototypeHtml = protoTypeHtmlCache.get(key);
-            if(prototypeHtml==null && empty){
+            if (prototypeHtml == null && empty) {
                 throw new RuntimeException("参数不合法！");
             }
             if (!empty) {
-                if(prototypeHtml!=null){
-                    UnzipUtil.unZipFiles(getZipDir() + "/" + key + "/"
-                                    + PREX_DIRECTORY
-                                    + (prototypeHtml == null ? FIRST_VERSION : (prototypeHtml.getVersion().intValue() + 1))
-                            , key, file, true);
+                /*if (prototypeHtml != null) {*/
+                SimpleOutput output1 = UnzipUtil.unZipFiles(getZipDir() + "/" + key + "/"
+                                + PREX_DIRECTORY
+                                + (prototypeHtml == null ? FIRST_VERSION : (prototypeHtml.getVersion().intValue() + 1))
+                        , key, file, true);
+                if (!RetCodeUtil.isSucc(output1.getRetCode())) {
+                    throw new RuntimeException("上传文件失败！");
                 }
-                UnzipUtil.unZipFiles(getZipDir(), key, file, false);
+                /*}*/
+                SimpleOutput output2 = UnzipUtil.unZipFiles(getZipDir(), key, file, false);
+                if (!RetCodeUtil.isSucc(output2.getRetCode())) {
+                    throw new RuntimeException("上传文件失败！");
+                }
             }
             if (prototypeHtml == null) {
                 //新增
@@ -86,19 +95,21 @@ public class FileUploadController {
                 prototypeHtmlTemp.setKey(key);
                 prototypeHtmlTemp.setName(name);
                 prototypeHtmlTemp.setCreator(creator);
+                prototypeHtmlTemp.setRemark(remark);
                 prototypeHtml = new PrototypeHtml();
                 BeanUtils.copyProperties(prototypeHtmlTemp, prototypeHtml);
             } else {
-                if (!empty){
-                    protoTypeHtmlCache.saveUpdateLog(key,prototypeHtml);
+                if (!empty) {
+                    protoTypeHtmlCache.saveUpdateLog(key, prototypeHtml);
                 }
                 if (!empty) {
                     //zip包更新才更新时间
-                    prototypeHtml.setCreator(creator);
-                    prototypeHtml.setName(name);
                     prototypeHtml.setUpdateTime(new Date());
                     prototypeHtml.setVersion(prototypeHtml.getVersion() + 1);
                 }
+                prototypeHtml.setCreator(creator);
+                prototypeHtml.setName(name);
+                prototypeHtml.setRemark(remark);
             }
             protoTypeHtmlCache.save(key, prototypeHtml);
             output = new SimpleOutput(RetCode.SUCCESS.retCode, RetCode.SUCCESS.message, null);

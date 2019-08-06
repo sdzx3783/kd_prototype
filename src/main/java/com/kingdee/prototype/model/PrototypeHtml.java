@@ -33,6 +33,10 @@ public class PrototypeHtml {
     private Integer version;
 
     /**
+     * 备注
+     */
+    private String remark;
+    /**
      * 创建时间
      */
     @JsonFormat(timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
