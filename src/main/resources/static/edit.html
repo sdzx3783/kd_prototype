@@ -5,10 +5,12 @@
     <title id="title">Title</title>
 </head>
 <script src="jquery.min.js"></script>
+<link rel="stylesheet" href="bootstrap.min.css">
+<script src="bootstrap.min.js"></script>
 <style type="text/css">
     .uploadZipFile {
         text-align: center;
-        margin: 100px;
+        margin-top: 100px;
     }
 
     .title {
@@ -22,38 +24,54 @@
 </style>
 <body>
 <div class="title">
-    提示：项目key请联系开发人员获取！
+
 </div>
 
-<div class="uploadZipFile" id="uploadZipFile" height="600">
-    <form name="zipForm" id="zipForm">
-        <table width="100%" border="0" cellspacing="1" cellpadding="0">
-            <tr align="center">
-                项目key：<input type="text" id="key" name="key" placeholder="请输入项目key"/>
+<div class="uploadZipFile container" id="uploadZipFile" height="600">
+    <form name="zipForm" class="form-horizontal"  role="form" id="zipForm">
+        <div class="form-group">
+            <label class="col-md-4 control-label" for="key">项目key</label>
+            <div class="col-md-4">
+                <input type="text" class="form-control" id="key" name="key" placeholder="请输入项目key">
+                <p class="help-block">提示：项目key请联系开发人员获取</p>
                 <div class="key-check" style="color: red"></div>
-            </tr>
-            <tr align="center">
-                项目名称：<input type="text" id="name" name="name" placeholder="请输入项目名称"/>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-md-4 control-label"  for="name">项目名称</label>
+            <div class="col-md-4">
+                <input type="text" class="form-control" id="name" name="name"  placeholder="请输入项目名称">
                 <div class="name-check" style="color: red"></div>
-            </tr>
-            <tr align="center">
-                创建人：<input type="text" id="creator" name="creator" placeholder="请输入创建人"/>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-md-4 control-label" for="creator">创建人</label>
+            <div class="col-md-4">
+                <input type="text" class="form-control" id="creator" name="creator" placeholder="请输入创建人">
                 <div class="creator-check" style="color: red"></div>
-            </tr>
-            <tr align="center">
-                备注：<input type="text" id="remark" name="remark" placeholder="请输入备注"/>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-md-4 control-label" for="remark">备注</label>
+            <div class="col-md-4">
+                <textarea  class="form-control" id="remark" name="remark" placeholder="请输入备注"></textarea>
                 <div class="remark-check" style="color: red"></div>
-            </tr>
-            <tr align="center">
-                项目原型zip包：<input type="file" name="file_zip" id="file-zip"/>
-            </tr>
-            <tr align="center">
-                <input type="button" class="" id="upload-zip" value="提交"/><br/>
-                <input type="button" class="" id="backhome" value="回到首页"/>
-            </tr>
-        </table>
+            </div>
+
+        </div>
+        <div class="form-group">
+            <label class="col-md-4 control-label"  class="sr-only" for="inputfile">项目原型zip包</label>
+            <div class="col-md-4">
+                <input type="file" name="file_zip" id="file-zip">
+                <p class="help-block">提示：上传的文件只支持zip文件类型</p>
+            </div>
+        </div>
+        <button type="button" class="btn btn-success" id="upload-zip">提交</button>
+        <a href="/main" class="btn btn-default">回到首页</a>
+
     </form>
 </div>
+
 
 </body>
 <script type="text/javascript">
@@ -80,6 +98,8 @@
             if (fileName == '') {
                 $('.key-check').html('');
                 $('.key-check').append("请输入项目key！")
+            }else{
+                $('.key-check').html('');
             }
         });
         //当鼠标移出输入框
@@ -88,6 +108,8 @@
             if (fileName == '') {
                 $('.name-check').html('');
                 $('.name-check').append("请输入项目名称！")
+            }else{
+                $('.name-check').html('');
             }
         });
         //当鼠标移出输入框
@@ -96,9 +118,10 @@
             if (fileName == '') {
                 $('.creator-check').html('');
                 $('.creator-check').append("请输入创建人！")
+            }else{
+                $('.creator-check').html('');
             }
         });
-
         $("#file-zip").bind("change", function () {
             var imgArr = ["zip"];
             if ($(this).val() == "") {
@@ -137,8 +160,8 @@
             click=false;
             var formdata = new FormData(form);
             $.ajax({
-                url: "http://172.20.61.42:8000/service/prototype/file/upload",
-                // url: "http://172.17.3.111:8000/service/prototype/file/upload",
+                url: "http://172.20.61.42:8111/service/prototype/file/upload",
+                //url: "http://172.17.3.111:8000/service/prototype/file/upload",
                 data: formdata,
                 type: "post",
                 //预期服务器返回的数据类型,自动解析json返回值，不设置的话可能要执行oResult = JSON.parse(oResult);进行解析
@@ -171,8 +194,6 @@
 //                alert('出现错误，请重试');
 //            });
         })
-
-
         function getQueryVariable(variable) {
             var query = window.location.search.substring(1);
             query = decodeURI(query);
@@ -185,9 +206,7 @@
             }
             return (false);
         }
-        $("#backhome").on("click",function () {
-            window.location.href="/main";
-        })
+
     });
 </script>
 
