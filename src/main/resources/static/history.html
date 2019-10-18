@@ -2,31 +2,29 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title id="title">项目原型历史版本</title>
+    <title id="title">原型历史版本</title>
 </head>
 <script src="jquery.min.js"></script>
+<link rel="stylesheet" href="bootstrap.min.css">
+<script src="bootstrap.min.js"></script>
 <style type="text/css">
     .uploadZipFile {
         text-align: center;
         margin: 100px;
     }
-
-    .title {
+    caption{
         text-align: center;
     }
 
-    input[readonly] {
-        border: 0px;
+
+    tr {
+        text-align:left;
     }
-    tr{
-        margin-bottom:20px;
-        margin-top: 20px;
-        height: 30px;
-    }
-    .remark {
-        width: 400px;
-        word-break: break-all;
-        overflow: auto;
+
+    .new{
+        position: absolute;
+        left: 100px;
+        top: 160px;
     }
 </style>
 <body>
@@ -35,56 +33,55 @@
 </div>
 
 <div class="uploadZipFile" id="uploadZipFile" height="600">
-    <form name="zipForm" id="zipForm">
-        <table id="tab" width="100%" border="0" cellspacing="1" cellpadding="0">
-            <caption align="center" style="margin-bottom:50px;font-size: 25px" >原型历史版本</caption>
-            <thead align="center">
-                <th>key</th>
-                <th>名称</th>
-                <th>历史版本</th>
-                <th>项目创建人</th>
-                <th>项目更新时间</th>
-                <th class="remark">备注</th>
-                <th>操作</th>
-            </thead>
-
-        </table>
-    </form>
+    <table id="tab" class="table table-hover">
+        <caption align="center" style="margin-bottom:50px;font-size: 25px" >原型历史版本</caption>
+        <thead align="center">
+        <a href="/main"  class="new btn btn-success">回到首页</a>
+        <th>key</th>
+        <th>名称</th>
+        <th>历史版本</th>
+        <th>项目创建人</th>
+        <th>项目更新时间</th>
+        <th class="remark">备注</th>
+        <th>操作</th>
+        </thead>
+        <tbody id="tabbody">
+        </tbody>
+    </table>
 </div>
-
 </body>
 <script type="text/javascript">
     $(window).load(function () {
 
-            $.ajax({
-               url: "http://172.20.61.42:8000/service/prototype/html/getAllUpdateLogs?key="+getQueryVariable("key"),
-                // url:"http://172.17.3.111:8000/service/prototype/html/getAllUpdateLogs?key="+getQueryVariable("key"),
-                data: [],
-                type: "post",
-                //预期服务器返回的数据类型,自动解析json返回值，不设置的话可能要执行oResult = JSON.parse(oResult);进行解析
-                dataType: "json",
-                //默认值: true。默认情况下，通过data选项传递进来的数据，如果是一个对象(技术上讲只要不是字符串)，
-                // 都会处理转化成一个查询字符串，以配合默认内容类型 "application/x-www-form-urlencoded"。如果要发送 DOM 树信息或其它不希望转换的信息，请设置为 false。
-                processData: false,
-                //contentType: false,避免 JQuery 对data操作，可能失去分界符，而使服务器不能正常解析文件。
-                contentType: false,
-                success: function (oResult) {
+        $.ajax({
+            url: "http://172.20.61.42:8111/service/prototype/html/getAllUpdateLogs?key="+getQueryVariable("key"),
+            //url:"http://172.17.3.111:8000/service/prototype/html/getAllUpdateLogs?key="+getQueryVariable("key"),
+            data: [],
+            type: "post",
+            //预期服务器返回的数据类型,自动解析json返回值，不设置的话可能要执行oResult = JSON.parse(oResult);进行解析
+            dataType: "json",
+            //默认值: true。默认情况下，通过data选项传递进来的数据，如果是一个对象(技术上讲只要不是字符串)，
+            // 都会处理转化成一个查询字符串，以配合默认内容类型 "application/x-www-form-urlencoded"。如果要发送 DOM 树信息或其它不希望转换的信息，请设置为 false。
+            processData: false,
+            //contentType: false,避免 JQuery 对data操作，可能失去分界符，而使服务器不能正常解析文件。
+            contentType: false,
+            success: function (oResult) {
 //                    console.log(oResult);
-                    var ht="";
-                    if (oResult.retCode == "100") {
-                        var arr= oResult.retData;
-                        for (var i = 0; i <arr.length; i++) {
-                            var v=arr[i];
-                            var template = "<tr><td>" + v.key + "</td><td><a href='/"+v.key+"/kd_EC_V_"+v.version+"'>" + v.name + "</a></td><td>V" + v.version + "</td><td>" + v.creator + "</td><td>" + v.updateTime + "</td><td>"+v.remark+"</td><td><a href='/"+v.key+"/kd_EC_V_"+v.version+"'>查看</a></td></tr>";
-                            ht += template;
-                        }
-                        $("#tab").append(ht)
-                    } else {
-                        alert("操作失败：" + oResult.msg);
+                var ht="";
+                if (oResult.retCode == "100") {
+                    var arr= oResult.retData;
+                    for (var i = 0; i <arr.length; i++) {
+                        var v=arr[i];
+                        var template = "<tr><td>" + v.key + "</td><td><a href='/"+v.key+"/kd_EC_V_"+v.version+"'>" + v.name + "</a></td><td>V" + v.version + "</td><td>" + v.creator + "</td><td>" + v.updateTime + "</td><td>"+v.remark+"</td><td><a href='/"+v.key+"/kd_EC_V_"+v.version+"'>查看</a></td></tr>";
+                        ht += template;
                     }
+                    $("#tabbody").append(ht)
+                } else {
+                    alert("操作失败：" + oResult.msg);
                 }
-            })
-//              .done(function(oResult) {   //注意done表示成功，fail表示失败，always表示不论成功还是失败，会执行的函数，
+            }
+        })
+    //              .done(function(oResult) {   //注意done表示成功，fail表示失败，always表示不论成功还是失败，会执行的函数，
 //                                          //但是在低版本jquery不兼容，是高版本jquery推荐
 //                if(oResult.success==1){
 //                    window.location.href="/";
